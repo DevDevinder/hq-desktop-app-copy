@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="./app/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HQ Dispatch System</title>
+    <script type="module" src="./app/views/main.js" defer></script>
+  </head>
+  <body>
+    <main class="container">
+      <h1>HQ Dispatch System</h1>
+
+      <!-- Search Patient Form -->
+      <section id="search-patient-section">
+        <h2>Search for a Patient</h2>
+        <form id="search-patient-form">
+          <label for="search-name">Name:</label>
+          <input id="search-name" type="text" placeholder="Enter name..." aria-label="Patient Name" />
+
+          <label for="search-address">Address:</label>
+          <input id="search-address" type="text" placeholder="Enter address..." aria-label="Patient Address" />
+
+          <label for="search-nhs">NHS Registration Number:</label>
+          <input id="search-nhs" type="text" placeholder="Enter NHS number..." aria-label="NHS Number" />
+
+          <label for="search-condition">Medical Condition:</label>
+          <input id="search-condition" type="text" placeholder="Enter condition..." aria-label="Medical Condition" />
+
+          <button type="submit" aria-label="Search Button">Search</button>
+        </form>
+
+        <div id="search-results" class="results-container">
+          <!-- Matching patient results will be displayed here -->
+          <p>No results to display. Start a search above.</p>
+        </div>
+      </section>
+
+      <!-- Submit Patient Information Form -->
+      <section id="submit-patient-section">
+        <h2>Submit Patient Information</h2>
+        <form id="submit-patient-form">
+          <label for="submit-name">Name:</label>
+          <input id="submit-name" type="text" placeholder="Enter name..." required aria-label="Submit Patient Name" />
+
+          <label for="submit-address">Address:</label>
+          <input id="submit-address" type="text" placeholder="Enter address..." required aria-label="Submit Patient Address" />
+      
+          <label for="submit-nhs">NHS Registration Number:</label>
+          <input id="submit-nhs" type="text" placeholder="Enter NHS number..." required aria-label="Submit NHS Number" />
+      
+          <label for="submit-condition">Medical Condition:</label>
+          <input id="submit-condition" type="text" placeholder="Enter condition..." required aria-label="Submit Medical Condition" />
+
+          <label for="submit-dob">Date of Birth:</label>
+          <input id="submit-dob" type="date" required aria-label="Submit Date of Birth" />
+      
+          <label for="submit-location">Current Location:</label>
+          <div class="location-container">
+            <input 
+              id="submit-location" 
+              type="text" 
+              placeholder="Enter an address or lat,long..." 
+              required 
+              aria-label="Patient Current Location" 
+            />
+            <button type="button" id="geocode-button" aria-label="Geocode Address Button">Geocode Address</button>
+          </div>
+          <p class="note">Note: Enter an address or lat,long values. Use "Geocode Address" to convert an address.</p>
+      
+          <label for="call-notes">Call Notes:</label>
+          <textarea id="call-notes" placeholder="Enter call notes..." aria-label="Call Notes"></textarea>
+      
+          <label for="required-specialty">Required Specialty:</label>
+          <input 
+            id="required-specialty" 
+            type="text" 
+            placeholder="Enter required specialty..." 
+            aria-label="Required Specialty" 
+          />
+
+          <label for="priority">Priority (Emergency):</label>
+          <input id="priority" type="checkbox" aria-label="Priority Checkbox" />
+      
+          <label for="specialist-required">Require Specialist:</label>
+          <input id="specialist-required" type="checkbox" aria-label="Specialist Required Checkbox" />
+      
+          <button type="submit" aria-label="Submit Dispatch Button">Submit to KwikMedical</button>
+        </form>
+      
+        <div id="operation-status" class="status-message">
+          <!-- Status messages for operations will be displayed here -->
+          <p>Status updates will appear here.</p>
+        </div>
+      </section>
+
+      <!-- Search Dispatch Section -->
+      <section id="search-dispatch-section">
+        <h2>Search Dispatch by NHS Registration Number</h2>
+        <form id="search-dispatch-form">
+          <label for="search-nhs-dispatch">NHS Registration Number:</label>
+          <input id="search-nhs-dispatch" type="text" placeholder="Enter NHS number..." required aria-label="Search Dispatch by NHS Registration Number" />
+          <button type="submit" aria-label="Search Dispatch Button">Search Dispatch</button>
+        </form>
+        <div id="dispatches-container">
+          <!-- Matching dispatch will be displayed here -->
+          <p>No dispatch to display. Search for a specific dispatch above.</p>
+             
+       
+      </div>
+      </section>
+    </main>
+  </body>
+</html>
