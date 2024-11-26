@@ -1,0 +1,18 @@
+{
+  "name": "hq-desktop-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "tauri": "tauri",
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "vite": "^5.4.11"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.46.1"
+  }
+}
