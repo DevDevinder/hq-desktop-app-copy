@@ -1,22 +1,35 @@
-// src/app/components/dispatchSearch.js
-
-import { fetchDispatchByNHS } from '../../repositories/dispatchRepository.js';
-import { reassignHospital } from '../../services/realtimeService.js';
-
-
 export function setupDispatchSearch() {
-  document.querySelector('#search-dispatch-form').addEventListener('submit', async (event) => {
-    event.preventDefault();
+  document
+    .querySelector('#search-dispatch-form')
+    .addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-    const nhsNumber = document.querySelector('#search-nhs-dispatch').value.trim();
+      const nhsNumber = document.querySelector('#search-nhs-dispatch').value.trim();
 
-    if (!nhsNumber) {
-      alert('Please enter an NHS Registration Number.');
-      return;
+      if (!nhsNumber) {
+        alert('Please enter an NHS Registration Number.');
+        return;
+      }
+
+      await renderDispatchForNHS(nhsNumber);
+    });
+}
+
+async function fetchDispatchByNHSFromAPI(nhsNumber) {
+  try {
+    const response = await fetch(`http://localhost:3000/api/dispatches/by-nhs/${nhsNumber}`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch dispatch: ${response.statusText}`);
     }
 
-    await renderDispatchForNHS(nhsNumber);
-  });
+    return await response.json();
+  } catch (error) {
+    console.error('fetchDispatchByNHSFromAPI error:', error);
+    throw error;
+  }
 }
 
 export async function renderDispatchForNHS(nhsNumber) {
@@ -24,14 +37,14 @@ export async function renderDispatchForNHS(nhsNumber) {
   dispatchesContainer.innerHTML = '';
 
   try {
-    const dispatch = await fetchDispatchByNHS(nhsNumber);
+    const dispatch = await fetchDispatchByNHSFromAPI(nhsNumber);
 
     if (!dispatch) {
-      dispatchesContainer.innerHTML = '<p>No active dispatch found for the provided NHS Registration Number.</p>';
+      dispatchesContainer.innerHTML =
+        '<p>No active dispatch found for the provided NHS Registration Number.</p>';
       return;
     }
 
-    // Render the dispatch card
     const dispatchCard = document.createElement('div');
     dispatchCard.classList.add('dispatch-card');
 
@@ -52,11 +65,10 @@ export async function renderDispatchForNHS(nhsNumber) {
     dispatchesContainer.appendChild(dispatchCard);
 
     document.querySelectorAll('.reassign-button').forEach((button) => {
-      button.addEventListener('click', (event) => {
+      button.addEventListener('click', async (event) => {
         const dispatchId = event.target.getAttribute('data-dispatch-id');
-        reassignHospital(dispatchId);
-        //refresh the dispatch card
-        renderDispatchForNHS(nhsNumber);
+        await reassignHospital(dispatchId);
+        await renderDispatchForNHS(nhsNumber);
       });
     });
   } catch (error) {
@@ -65,3 +77,19 @@ export async function renderDispatchForNHS(nhsNumber) {
   }
 }
 
+async function reassignHospital(dispatchId) {
+  try {
+    const response = await fetch(`http://localhost:3000/api/dispatches/${dispatchId}/reassign`, {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to reassign hospital: ${response.statusText}`);
+    }
+
+    alert('Hospital reassigned successfully!');
+  } catch (error) {
+    console.error('reassignHospital error:', error);
+    alert('Failed to reassign hospital. Please try again.');
+  }
+}

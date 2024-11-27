@@ -1,5 +1,3 @@
-// src/repositories/dispatchRepository.js
-
 import { kwikMedicalDb } from './supabaseClient.js';
 import { fetchPatientIdByNHS } from './patientRepository.js';
 
@@ -119,6 +117,22 @@ export async function fetchDispatches() {
     return data || [];
   } catch (error) {
     console.error('fetchDispatches error:', error);
+    throw error;
+  }
+}
+
+export async function reassignHospitalByDispatchId(dispatchId) {
+  try {
+    const { error } = await kwikMedicalDb
+      .from('dispatches')
+      .update({ hospital_id: null })
+      .eq('dispatch_id', dispatchId);
+
+    if (error) {
+      throw new Error('Failed to reassign hospital.');
+    }
+  } catch (error) {
+    console.error('reassignHospitalByDispatchId error:', error);
     throw error;
   }
 }

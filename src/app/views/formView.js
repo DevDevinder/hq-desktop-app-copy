@@ -1,7 +1,3 @@
-// src/app/views/formView.js
-
-import { geocodeAddress } from '../../services/geoService.js';
-import { handleDispatch } from '../../services/callHandlingService.js';
 import { updateOperationStatus } from '../components/operationStatus.js';
 
 export function setupFormSubmission() {
@@ -18,9 +14,19 @@ async function geocodeAndUpdateLocation() {
   }
 
   try {
-    const location = await geocodeAddress(address);
-    document.querySelector('#submit-location').value = `${location.lat}, ${location.lng}`;
-    alert(`Geocoded Location: Latitude ${location.lat}, Longitude ${location.lng}`);
+    const response = await fetch('http://localhost:3000/api/hospitals/geocode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Geocoding failed: ${response.statusText}`);
+    }
+
+    const { lat, lng } = await response.json();
+    document.querySelector('#submit-location').value = `${lat}, ${lng}`;
+    alert(`Geocoded Location: Latitude ${lat}, Longitude ${lng}`);
   } catch (error) {
     alert(`Geocoding Error: ${error.message}`);
   }
@@ -53,6 +59,15 @@ async function submitPatient(event) {
       return;
     }
 
+    const dispatchData = {
+      priority,
+      requires_specialist: requiresSpecialist,
+      call_notes: callNotes || 'No notes provided',
+      required_specialty: requiresSpecialist ? requiredSpecialty : null,
+      location: { lat, lng },
+      address,
+    };
+
     const patientDetails = {
       name,
       nhs_registration_number: nhs,
@@ -61,25 +76,20 @@ async function submitPatient(event) {
       medical_history: condition,
     };
 
-    const dispatchData = {
-      priority,
-      requires_specialist: requiresSpecialist,
-      call_notes: callNotes || 'No notes provided',
-      required_specialty: requiresSpecialist ? requiredSpecialty : null,
-      location: `SRID=4326;POINT(${lng} ${lat})`,
-      address,
-    };
+    const response = await fetch('http://localhost:3000/api/call-handling/dispatch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dispatchData, patientDetails }),
+    });
+    console.log(response);
 
-    const { dispatchId, assignedHospital, assignedAmbulance } = await handleDispatch(
-      dispatchData,
-      patientDetails
-    );
-
-    if (!dispatchId) {
-      updateOperationStatus('Dispatch creation failed.', 'error');
+    if (!response.ok) {
+      const errorData = await response.json(); 
+      updateOperationStatus(errorData.message, 'error'); 
       return;
     }
 
+    const { dispatchId, assignedHospital, assignedAmbulance } = await response.json();
     updateOperationStatus(
       `Dispatch created successfully. Hospital: ${assignedHospital.name}, Ambulance ID: ${assignedAmbulance.ambulance_id}`,
       'success'
